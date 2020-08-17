@@ -15,16 +15,17 @@ public class ActivityDAO {
 	
 	public boolean needsFillAmount(int idActivity) throws SQLException{
 		Connection conn = null;
-		Statement stmt = null;
+		PreparedStatement stmt = null;
 		ResultSet rs = null;
 		
 		try{
 			conn = ConnectionDAO.getInstance().getConnection();
-			stmt = conn.createStatement();
 			
-			rs = stmt.executeQuery("SELECT activityunit.fillamount FROM activityunit " +
+			stmt = conn.prepareStatement("SELECT activityunit.fillamount FROM activityunit " +
 					"INNER JOIN activity ON activity.idactivityunit=activityunit.idactivityunit " +
 					"WHERE activity.idactivity=" + String.valueOf(idActivity));
+			
+			rs = stmt.executeQuery();
 			
 			if(rs.next()){
 				return (rs.getInt("fillamount") == 1);
@@ -32,28 +33,24 @@ public class ActivityDAO {
 				return false;	
 			}
 		}finally{
-			if((rs != null) && !rs.isClosed())
-				rs.close();
-			if((stmt != null) && !stmt.isClosed())
-				stmt.close();
-			if((conn != null) && !conn.isClosed())
-				conn.close();
+			 ConnectionClose(conn, stmt, rs);
 		}
 	}
 	
 	public List<Activity> listAll() throws SQLException{
 		Connection conn = null;
-		Statement stmt = null;
+		PreparedStatement stmt = null;
 		ResultSet rs = null;
 		
 		try{
 			conn = ConnectionDAO.getInstance().getConnection();
-			stmt = conn.createStatement();
 			
-			rs = stmt.executeQuery("SELECT activity.*, activityunit.description AS unit, activitygroup.description AS group, activitygroup.sequence AS groupSequence " +
+			stmt = conn.prepareStatement("SELECT activity.*, activityunit.description AS unit, activitygroup.description AS group, activitygroup.sequence AS groupSequence " +
 					"FROM activity INNER JOIN activityunit ON activityunit.idActivityUnit=activity.idActivityUnit " +
 					"INNER JOIN activitygroup ON activitygroup.idActivityGroup=activity.idActivityGroup " +
 					"ORDER BY activitygroup.sequence, activity.sequence");
+			
+			rs = stmt.executeQuery();
 			
 			List<Activity> list = new ArrayList<Activity>();
 			
@@ -63,12 +60,7 @@ public class ActivityDAO {
 			
 			return list;
 		}finally{
-			if((rs != null) && !rs.isClosed())
-				rs.close();
-			if((stmt != null) && !stmt.isClosed())
-				stmt.close();
-			if((conn != null) && !conn.isClosed())
-				conn.close();
+			 ConnectionClose(conn, stmt, rs);
 		}
 	}
 	
@@ -97,12 +89,7 @@ public class ActivityDAO {
 			
 			return list;
 		}finally{
-			if((rs != null) && !rs.isClosed())
-				rs.close();
-			if((stmt != null) && !stmt.isClosed())
-				stmt.close();
-			if((conn != null) && !conn.isClosed())
-				conn.close();
+			 ConnectionClose(conn, stmt, rs);
 		}
 	}
 	
@@ -132,12 +119,7 @@ public class ActivityDAO {
 			
 			return list;
 		}finally{
-			if((rs != null) && !rs.isClosed())
-				rs.close();
-			if((stmt != null) && !stmt.isClosed())
-				stmt.close();
-			if((conn != null) && !conn.isClosed())
-				conn.close();
+			 ConnectionClose(conn, stmt, rs);
 		}
 	}
 	
@@ -164,12 +146,7 @@ public class ActivityDAO {
 				return null;
 			}
 		}finally{
-			if((rs != null) && !rs.isClosed())
-				rs.close();
-			if((stmt != null) && !stmt.isClosed())
-				stmt.close();
-			if((conn != null) && !conn.isClosed())
-				conn.close();
+			 ConnectionClose(conn, stmt, rs);
 		}
 	}
 	
@@ -224,12 +201,7 @@ public class ActivityDAO {
 			
 			return activity.getIdActivity();
 		}finally{
-			if((rs != null) && !rs.isClosed())
-				rs.close();
-			if((stmt != null) && !stmt.isClosed())
-				stmt.close();
-			if((conn != null) && !conn.isClosed())
-				conn.close();
+			 ConnectionClose(conn, stmt, rs);
 		}
 	}
 	
@@ -301,12 +273,7 @@ public class ActivityDAO {
 				}
 			}
 		}finally{
-			if((rs != null) && !rs.isClosed())
-				rs.close();
-			if((stmt != null) && !stmt.isClosed())
-				stmt.close();
-			if((conn != null) && !conn.isClosed())
-				conn.close();
+			 ConnectionClose(conn, stmt, rs);
 		}
 	}
 	
@@ -359,13 +326,17 @@ public class ActivityDAO {
 				}
 			}
 		}finally{
-			if((rs != null) && !rs.isClosed())
-				rs.close();
-			if((stmt != null) && !stmt.isClosed())
-				stmt.close();
-			if((conn != null) && !conn.isClosed())
-				conn.close();
+			 ConnectionClose(conn, stmt, rs);
 		}
+	}
+	
+	private void  ConnectionClose(Connection conn, PreparedStatement stmt, ResultSet rs) throws SQLException {
+		if((rs != null) && !rs.isClosed())
+			rs.close();
+		if((stmt != null) && !stmt.isClosed())
+			stmt.close();
+		if((conn != null) && !conn.isClosed())
+			conn.close();
 	}
 
 }

@@ -37,27 +37,24 @@ public class BugReportDAO {
 				return null;
 			}
 		}finally{
-			if((rs != null) && !rs.isClosed())
-				rs.close();
-			if((stmt != null) && !stmt.isClosed())
-				stmt.close();
-			if((conn != null) && !conn.isClosed())
-				conn.close();
+			ConnectionClose(conn, stmt, rs);
 		}
 	}
-	
+
 	public List<BugReport> listAll() throws SQLException{
 		Connection conn = null;
-		Statement stmt = null;
+		PreparedStatement stmt= null;
 		ResultSet rs = null;
 		
 		try{
 			conn = ConnectionDAO.getInstance().getConnection();
-			stmt = conn.createStatement();
 			
-			rs = stmt.executeQuery("SELECT bugreport.*, \"user\".name " +
+			stmt = conn.prepareStatement("SELECT bugreport.*, \"user\".name " +
 					"FROM bugreport INNER JOIN \"user\" ON \"user\".idUser=bugreport.idUser " +
 					"ORDER BY status, reportdate");
+			
+			rs = stmt.executeQuery();
+			
 			List<BugReport> list = new ArrayList<BugReport>();
 			
 			while(rs.next()){
@@ -66,12 +63,7 @@ public class BugReportDAO {
 			
 			return list;
 		}finally{
-			if((rs != null) && !rs.isClosed())
-				rs.close();
-			if((stmt != null) && !stmt.isClosed())
-				stmt.close();
-			if((conn != null) && !conn.isClosed())
-				conn.close();
+			ConnectionClose(conn, stmt, rs);
 		}
 	}
 	
@@ -120,14 +112,19 @@ public class BugReportDAO {
 			
 			return bug.getIdBugReport();
 		}finally{
-			if((rs != null) && !rs.isClosed())
-				rs.close();
-			if((stmt != null) && !stmt.isClosed())
-				stmt.close();
-			if((conn != null) && !conn.isClosed())
-				conn.close();
+			ConnectionClose(conn, stmt, rs);
 		}
 	}
+	
+	private void ConnectionClose(Connection conn, PreparedStatement stmt, ResultSet rs) throws SQLException {
+		if((rs != null) && !rs.isClosed())
+			rs.close();
+		if((stmt != null) && !stmt.isClosed())
+			stmt.close();
+		if((conn != null) && !conn.isClosed())
+			conn.close();
+	}
+	
 	
 	private BugReport loadObject(ResultSet rs) throws SQLException{
 		BugReport bug = new BugReport();

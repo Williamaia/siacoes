@@ -36,27 +36,23 @@ public class DepartmentDAO {
 				return null;
 			}
 		}finally{
-			if((rs != null) && !rs.isClosed())
-				rs.close();
-			if((stmt != null) && !stmt.isClosed())
-				stmt.close();
-			if((conn != null) && !conn.isClosed())
-				conn.close();
+			ConnectionClose(conn, stmt, rs);
 		}
 	}
 	
 	public List<Department> listAll(boolean onlyActive) throws SQLException{
 		Connection conn = null;
-		Statement stmt = null;
+		PreparedStatement stmt = null;
 		ResultSet rs = null;
 		
 		try{
 			conn = ConnectionDAO.getInstance().getConnection();
-			stmt = conn.createStatement();
 		
-			rs = stmt.executeQuery("SELECT department.*, campus.name AS campusName " +
+		stmt = conn.prepareStatement("SELECT department.*, campus.name AS campusName " +
 					"FROM department INNER JOIN campus ON campus.idCampus=department.idCampus " + 
 					(onlyActive ? " WHERE department.active=1" : "") + " ORDER BY department.name");
+			
+			rs = stmt.executeQuery();
 			
 			List<Department> list = new ArrayList<Department>();
 			
@@ -66,27 +62,23 @@ public class DepartmentDAO {
 			
 			return list;
 		}finally{
-			if((rs != null) && !rs.isClosed())
-				rs.close();
-			if((stmt != null) && !stmt.isClosed())
-				stmt.close();
-			if((conn != null) && !conn.isClosed())
-				conn.close();
+			ConnectionClose(conn, stmt, rs);
 		}
 	}
 	
 	public List<Department> listByCampus(int idCampus, boolean onlyActive) throws SQLException{
 		Connection conn = null;
-		Statement stmt = null;
+		PreparedStatement stmt = null;
 		ResultSet rs = null;
 		
 		try{
 			conn = ConnectionDAO.getInstance().getConnection();
-			stmt = conn.createStatement();
 		
-			rs = stmt.executeQuery("SELECT department.*, campus.name AS campusName " +
+			stmt = conn.prepareStatement("SELECT department.*, campus.name AS campusName " +
 					"FROM department INNER JOIN campus ON campus.idCampus=department.idCampus " +
 					"WHERE department.idCampus=" + String.valueOf(idCampus) + (onlyActive ? " AND department.active=1" : "") + " ORDER BY department.name");
+			
+			rs = stmt.executeQuery();
 			
 			List<Department> list = new ArrayList<Department>();
 			
@@ -96,12 +88,7 @@ public class DepartmentDAO {
 			
 			return list;
 		}finally{
-			if((rs != null) && !rs.isClosed())
-				rs.close();
-			if((stmt != null) && !stmt.isClosed())
-				stmt.close();
-			if((conn != null) && !conn.isClosed())
-				conn.close();
+			ConnectionClose(conn, stmt, rs);
 		}
 	}
 	
@@ -152,13 +139,17 @@ public class DepartmentDAO {
 			
 			return department.getIdDepartment();
 		}finally{
-			if((rs != null) && !rs.isClosed())
-				rs.close();
-			if((stmt != null) && !stmt.isClosed())
-				stmt.close();
-			if((conn != null) && !conn.isClosed())
-				conn.close();
+			ConnectionClose(conn, stmt, rs);
 		}
+	}
+	
+	private void ConnectionClose(Connection conn, PreparedStatement stmt, ResultSet rs) throws SQLException {
+		if((rs != null) && !rs.isClosed())
+			rs.close();
+		if((stmt != null) && !stmt.isClosed())
+			stmt.close();
+		if((conn != null) && !conn.isClosed())
+			conn.close();
 	}
 	
 	private Department loadObject(ResultSet rs) throws SQLException{
