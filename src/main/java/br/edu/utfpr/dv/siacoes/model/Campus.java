@@ -1,6 +1,7 @@
 ﻿package br.edu.utfpr.dv.siacoes.model;
 
 import java.io.Serializable;
+import lombok.Data;
 
 public class Campus implements Serializable {
 	
@@ -14,7 +15,7 @@ public class Campus implements Serializable {
 	private String site;
 	private String initials;
 	
-	public Campus(){
+	public @Data Campus(){
 		this.setIdCampus(0);
 		this.setName("");
 		this.setAddress("");
@@ -23,6 +24,7 @@ public class Campus implements Serializable {
 		this.setSite("");
 		this.setInitials("");
 	}
+	
 	
 	public int getIdCampus() {
 		return idCampus;
