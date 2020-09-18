@@ -8,10 +8,12 @@ import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.apache.commons.lang3.NotImplementedException;
+
 import br.edu.utfpr.dv.siacoes.log.UpdateEvent;
 import br.edu.utfpr.dv.siacoes.model.ActivityUnit;
 
-public class ActivityUnitDAO {
+public class ActivityUnitDAO extends AbstractClassDAO<ActivityUnit> {
 	
 	public List<ActivityUnit> listAll() throws SQLException{
 		Connection conn = null;
@@ -31,34 +33,6 @@ public class ActivityUnitDAO {
 			}
 			
 			return list;
-		}finally{
-			if((rs != null) && !rs.isClosed())
-				rs.close();
-			if((stmt != null) && !stmt.isClosed())
-				stmt.close();
-			if((conn != null) && !conn.isClosed())
-				conn.close();
-		}
-	}
-	
-	public ActivityUnit findById(int id) throws SQLException{
-		Connection conn = null;
-		PreparedStatement stmt = null;
-		ResultSet rs = null;
-		
-		try{
-			conn = ConnectionDAO.getInstance().getConnection();
-			stmt = conn.prepareStatement("SELECT * FROM activityunit WHERE idActivityUnit=?");
-		
-			stmt.setInt(1, id);
-			
-			rs = stmt.executeQuery();
-			
-			if(rs.next()){
-				return this.loadObject(rs);
-			}else{
-				return null;
-			}
 		}finally{
 			if((rs != null) && !rs.isClosed())
 				rs.close();
@@ -117,7 +91,7 @@ public class ActivityUnitDAO {
 		}
 	}
 	
-	private ActivityUnit loadObject(ResultSet rs) throws SQLException{
+	public ActivityUnit loadObject(ResultSet rs) throws SQLException{
 		ActivityUnit unit = new ActivityUnit();
 		
 		unit.setIdActivityUnit(rs.getInt("idActivityUnit"));
@@ -126,6 +100,40 @@ public class ActivityUnitDAO {
 		unit.setAmountDescription(rs.getString("amountDescription"));
 		
 		return unit;
+	}
+
+	@Override
+	public ActivityUnit fingById(int id) throws SQLException {
+		Connection conn = null;
+		PreparedStatement stmt = null;
+		ResultSet rs = null;
+		
+		try{
+			conn = ConnectionDAO.getInstance().getConnection();
+			stmt = conn.prepareStatement("SELECT * FROM activityunit WHERE idActivityUnit=?");
+		
+			stmt.setInt(1, id);
+			
+			rs = stmt.executeQuery();
+			
+			if(rs.next()){
+				return this.loadObject(rs);
+			}else{
+				return null;
+			}
+		}finally{
+			if((rs != null) && !rs.isClosed())
+				rs.close();
+			if((stmt != null) && !stmt.isClosed())
+				stmt.close();
+			if((conn != null) && !conn.isClosed())
+				conn.close();
+		}
+	}
+	
+	@Override
+	public List<ActivityUnit> listAll(boolean on) throws SQLException {
+		throw new NotImplementedException("method not overridden");
 	}
 
 }

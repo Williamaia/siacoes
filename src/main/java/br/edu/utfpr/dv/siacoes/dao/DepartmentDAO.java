@@ -12,7 +12,7 @@ import java.util.List;
 import br.edu.utfpr.dv.siacoes.log.UpdateEvent;
 import br.edu.utfpr.dv.siacoes.model.Department;
 
-public class DepartmentDAO {
+public class DepartmentDAO extends AbstractClassDAO <Department> {
 
 	public Department findById(int id) throws SQLException{
 		Connection conn = null;
@@ -152,7 +152,7 @@ public class DepartmentDAO {
 			conn.close();
 	}
 	
-	private Department loadObject(ResultSet rs) throws SQLException{
+	public Department loadObject(ResultSet rs) throws SQLException{
 		Department department = new Department();
 		
 		department.setIdDepartment(rs.getInt("idDepartment"));
@@ -166,6 +166,18 @@ public class DepartmentDAO {
 		department.setInitials(rs.getString("initials"));
 		
 		return department;
+	}
+
+	@Override
+	public List<Department> listAll() throws SQLException {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public Department fingById(int id) throws SQLException {
+		// TODO Auto-generated method stub
+		return null;
 	}
 	
 }
